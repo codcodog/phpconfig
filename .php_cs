@@ -11,6 +11,7 @@ return PhpCsFixer\Config::create()
     ->setRules(array(
         '@PSR2' => true,
         'array_syntax' => array('syntax' => 'short'),
+        'array_indentation' => true,
         'binary_operator_spaces' => array(
             'default' => 'single_space',
         ),

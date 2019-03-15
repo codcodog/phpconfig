@@ -1,0 +1,14 @@
+{
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.0",
+        "jakub-onderka/php-parallel-lint": "^0.9.2"
+    },
+    "scripts": {
+        "cc": [
+            "vendor/bin/php-cs-fixer fix --diff --diff-format=udiff --dry-run -vvv --ansi"
+        ],
+        "cl": [
+            "vendor/bin/parallel-lint -j 10 ./lib ./tests"
+        ]
+    }
+}

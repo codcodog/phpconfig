@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# (c) Copyright codcodog
+#
+# PHP 语法检查以及代码规范检查
+#
+# 依赖：
+# - php-cs-fixer
+# - php-parallel-lint
+
+set -e
+
+PHP='php'
+CODE_STYLE_CHECK='vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format=udiff -vvv'
+CODE_SYNTAX_CHECK='vendor/bin/parallel-lint -j 10'
+
+files=$(git diff --cached --name-only)
+
+# 若 host 没有安装 PHP
+# 则使用 docker 环境的 PHP
+is_docker_php()
+{
+  if ! command -v $PHP > /dev/null 2>&1; then
+    PHP='docker exec php php'
+    CODE_STYLE_CHECK="$PHP $CODE_STYLE_CHECK"
+    CODE_SYNTAX_CHECK="$PHP $CODE_SYNTAX_CHECK"
+  fi
+}
+
+is_php()
+{
+  file_extension="${1##*.}"
+  if [[ "$file_extension" == 'php' ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
+check_syntax()
+{
+  if ! $CODE_SYNTAX_CHECK "$1" > /dev/null 2>&1; then
+    $CODE_SYNTAX_CHECK "$1"
+    exit 1
+  fi
+}
+
+check_style()
+{
+  if ! $CODE_STYLE_CHECK "$1" > /dev/null 2>&1; then
+    $CODE_STYLE_CHECK "$1"
+    exit 1
+  fi
+}
+
+main()
+{
+  is_docker_php
+  for f in $files; do
+    if is_php "$f"; then
+      check_syntax "$f"
+      check_style "$f"
+    fi
+  done
+}
+
+main
+exit 0

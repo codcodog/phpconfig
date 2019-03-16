@@ -7,6 +7,9 @@
         "cc": [
             "vendor/bin/php-cs-fixer fix --diff --diff-format=udiff --dry-run -vvv --ansi"
         ],
+        "cf": [
+            "vendor/bin/php-cs-fixer fix"
+        ],
         "cl": [
             "vendor/bin/parallel-lint -j 10 ./lib ./tests"
         ]

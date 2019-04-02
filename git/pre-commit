@@ -14,6 +14,13 @@ PHP='php'
 CODE_STYLE_CHECK='vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format=udiff -vvv'
 CODE_SYNTAX_CHECK='vendor/bin/parallel-lint -j 10'
 
+# 若在 `docker` 则需要设置其项目路径
+# 路径是相对 `php` 容器的工作目录路径而言
+# 设置格式如：osp/, 绝对路径为：/data/www/osp/, /data/www 是容器的工作目录路径
+# 注意最后是带 `/`
+# 若不是在 `docker` 则留空即可
+prefix='osp/'
+
 files=$(git diff --cached --name-only)
 
 # 若 host 没有安装 PHP
@@ -22,8 +29,8 @@ is_docker_php()
 {
   if ! command -v $PHP > /dev/null 2>&1; then
     PHP='docker exec php php'
-    CODE_STYLE_CHECK="$PHP $CODE_STYLE_CHECK"
-    CODE_SYNTAX_CHECK="$PHP $CODE_SYNTAX_CHECK"
+    CODE_STYLE_CHECK="$PHP $prefix$CODE_STYLE_CHECK"
+    CODE_SYNTAX_CHECK="$PHP $prefix$CODE_SYNTAX_CHECK"
   fi
 }
 
@@ -58,8 +65,8 @@ main()
   is_docker_php
   for f in $files; do
     if is_php "$f"; then
-      check_syntax "$f"
-      check_style "$f"
+      check_syntax "$prefix$f"
+      check_style "$prefix$f"
     fi
   done
 }
